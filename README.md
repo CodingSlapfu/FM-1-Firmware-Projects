@@ -1,13 +1,11 @@
 # FM-1 Firmware Projects
 
-## EIN-1
-
-The EIN-1 0.32.0 camera engineering checkpoint includes firmware, installer, emulator, source, checksums, and rebuild instructions. Firmware release and physical FM1 qualification are pending.
-
-Restore from a checkout of this repository:
+EIN-1 0.32.0 engineering checkpoints. Release qualification is pending.
 
 ```sh
-cat EIN-1/0.32.0/camera.zip.part* > EIN1-0.32.0-camera-checkpoint.zip
-printf '%s  %s\n' '30749da124ff7b2c5c0095e0de6d28ebbcd2d4dd9079882da8735a9c16a29572' EIN1-0.32.0-camera-checkpoint.zip | sha256sum -c -
-unzip EIN1-0.32.0-camera-checkpoint.zip
+cat EIN-1/0.32.0/graph.zip.part* > graph.zip
+printf '%s  %s\n' '8670945b0bc71d644474257512cf5acdad5aa6381cfdfa1da4e3a466696b8764' graph.zip | sha256sum -c -
+unzip graph.zip
 ```
+
+The earlier camera checkpoint remains available as camera.zip.part files.

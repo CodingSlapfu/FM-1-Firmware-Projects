@@ -1,0 +1,63 @@
+--- a/firmware/src/app/ui.c
++++ b/firmware/src/app/ui.c
+@@ -665,7 +665,7 @@
+  fx_text(107,8,45,page,FX_INK,&FONT_XS);
+  fx_power();
+  fx_text(8,30,148,GX_VIEW[ui.view],GX_TEAL,&FONT_XS);
+- fx_text(160,30,72,GALAXY_NAME[ui.view==V_MIXER?ui.lane:ui.sel],GX_DIM,&FONT_XS);
++ fx_text(160,30,72,GALAXY_NAME[ui.view==V_MIXER?ui.lane:ui.sel],ui.view==V_MIXER?GX_WHITE:GX_DIM,&FONT_XS);
+ }
+ static const char *fx_hint(void){switch(ui.view){case V_COMPOSITION:case V_TIMING:return "* PENDING / APPLIES AT SAFE BAR";case V_STRUM:return "K1 TOGETHER/STRUM K2 GAP 80-200";case V_MOTIF_MODE:case V_EXPRESSION:return "K1-4 SHAPE / SELECT IN EDIT:ROLE";case V_BLUETOOTH:return "K2 -FAR +NEAR / EDIT: MORE";case V_OBSERVATORY:return ui_edit?"SELECT: CRYSTAL / SEL: EXIT":"SELECT: PAGE / SEL: CRYSTALS";case V_MIXER:return ui_edit?"TRACK SELECT / SEL: EXIT":"SELECT: PAGE / SEL: TRACK SELECT";case V_MATRIX:return "K1 LEVEL K2 PAN K3 MUTE K4 SOLO";case V_PLANETS:return "SELECT: WORLD / PRESET: INTENT";case V_SCENES:return "K1: SCENE / K2: GALAXY";case V_DRUMS:return "K1 MODE / K2 KIT / K4 HIT RATE";case V_DRUMFX:return "ARP: DRUM PARTS / K1-4: FX";case V_BASS:return "EDIT: NEXT BASS CONTROLS";case V_INTENT:return "PRESETS: RECIPE / K1: FREQUENCY";case V_VOICE:return "LIVE: STRUM / EDIT: WORLDS";default:return "HOME: LIVE / SAVE: KEEP";}}
+ static void fx_dock(void){char b[24],label[32];int h=fx_dock_height(),top=240-h,row=(h-24)/2;fx_text(7,top-17,226,fx_hint(),GX_DIM,&FONT_XS);
+@@ -714,7 +714,7 @@
+ /* -48..0dBFS display range: useful motion for normal quiet ambient tracks.
+  * DSP publishes a conservative post-fader stereo dry peak bound. */
+ static int fx_meter_height(float peak){if(peak<=.0039810717f)return 0;float db=6.0205999f*fm_log2f(peak);return (int)fm_clampf((db+48)*(115.0f/48),0,115);}
+-static void fx_balance(void){for(int l=0;l<8;l++){int x=8+l*29,manual=proj.par[l==EN_DRUM_TRACK?P_DRUM_LEVEL:LP(l,L_LEVEL)],level=fx_mix_level(l),height=(level>100?100:level)*115/100;uint16_t c=GX_COLOR[l];fx_small(x,47,24,(const char *const[]){"P","B","L","C","H","A","M","D"}[l],l==ui.lane?GX_WHITE:c);fx_panel(x-2,66,24,127,GX_PANEL);cv_rect(x+4,71,9,115,GX_BG);cv_rect(x+4,186-height,9,height,gx_mix(GX_BG,c,11));cv_line(x-1,186-manual*115/100,x+2,186-manual*115/100,GX_DIM);if(level>100)fx_small(x+5,60,10,"+",c);int mh=fx_meter_height(en_lane_rms[l]),ph=fx_meter_height(en_lane_peak[l]);cv_pset(x+16,186-ph,GX_WHITE);cv_rect(x+16,186-mh,2,mh,en_clip[l]?RGB(255,70,55):mh>100?RGB(255,210,70):c);cv_line(x+1,186-height,x+15,186-height,l==ui.lane?GX_WHITE:c);if(l==ui.lane)cv_line(x-1,196,x+19,196,GX_TEAL);char b[8];gx_num(b,level);fx_small(x,199,23,b,GX_WHITE);uint32_t flags=en_track_flags(l);fx_small(x+13,47,10,en_clip[l]?"!":proj.par[LP(l,L_SOLO)]?"S":flags&2?"M":flags&4?"-":"",en_clip[l]?RGB(255,70,55):GX_DIM);}char detail[32],*at=detail;gx_str(at,"PAN ",32);at+=4;gx_num(at,proj.par[LP(ui.lane,L_PAN)]);while(*at)at++;gx_str(at," / R ",32-(int)(at-detail));while(*at)at++;gx_num(at,proj.par[ui.lane==EN_DRUM_TRACK?P_DRUM_ROOM:LP(ui.lane,L_REVERB)]);while(*at)at++;gx_str(at," / E ",32-(int)(at-detail));while(*at)at++;gx_num(at,proj.par[ui.lane==EN_DRUM_TRACK?P_DRUM_ECHO:LP(ui.lane,L_ECHO)]);fx_small(7,227,228,ui_mixer_sends?"K1 VOL K2 PAN K3 ROOM K4 ECHO":"K1 VOL K2 PAN K3 MUTE K4 SOLO",GX_WHITE);fx_small(7,213,228,ui_edit?"SELECT: TRACK / EDIT: SENDS":"SEL: TRACK EDIT / EDIT: SENDS",GX_TEAL);}
++static void fx_balance(void){for(int l=0;l<8;l++){int x=8+l*29,manual=proj.par[l==EN_DRUM_TRACK?P_DRUM_LEVEL:LP(l,L_LEVEL)],level=fx_mix_level(l),height=(level>100?100:level)*115/100;uint16_t c=GX_COLOR[l];fx_small(x,47,24,(const char *const[]){"P","B","L","C","H","A","M","D"}[l],l==ui.lane?GX_WHITE:c);fx_panel(x-2,66,24,127,GX_PANEL);cv_rect(x+4,71,9,115,GX_BG);cv_rect(x+4,186-height,9,height,gx_mix(GX_BG,c,11));cv_line(x-1,186-manual*115/100,x+2,186-manual*115/100,GX_DIM);if(level>100)fx_small(x+5,60,10,"+",c);int mh=fx_meter_height(en_lane_rms[l]),ph=fx_meter_height(en_lane_peak[l]);cv_pset(x+16,186-ph,GX_WHITE);cv_rect(x+16,186-mh,2,mh,en_clip[l]?RGB(255,70,55):mh>100?RGB(255,210,70):c);cv_line(x+1,186-height,x+15,186-height,l==ui.lane?GX_WHITE:c);if(l==ui.lane)cv_line(x-1,196,x+19,196,GX_TEAL);char b[8];gx_num(b,level);fx_small(x,199,23,b,GX_WHITE);uint32_t flags=en_track_flags(l);fx_small(x+13,47,10,en_clip[l]?"!":proj.par[LP(l,L_SOLO)]?"S":flags&2?"M":flags&4?"-":"",en_clip[l]?RGB(255,70,55):GX_DIM);}fx_small(7,227,228,ui_mixer_sends?"K1 VOL K2 PAN K3 ROOM K4 ECHO":"K1 VOL K2 PAN K3 MUTE K4 SOLO",GX_WHITE);fx_small(7,213,228,ui_edit?"SELECT: TRACK / EDIT: SENDS":"SEL: TRACK EDIT / EDIT: SENDS",GX_TEAL);}
+ /* Bounded analytic displays. Never imply these curves measure audio. */
+ static void fx_value(int x,int y,const char *name,int value,const char *unit){char b[40],n[12];gx_str(b,name,40);int k=0;while(b[k])k++;gx_num(n,value);gx_str(b+k,n,40-k);while(b[k])k++;gx_str(b+k,unit,40-k);fx_small(x,y,228-x,b,GX_DIM);}
+ #include "living_graphs.h"
+@@ -802,7 +802,11 @@
+   gx_str(b,"PEAK GUARD ",40);gx_num(b+11,(int)(en_mix_limit*100));at=b;while(*at)at++;gx_str(at,"% GAIN",40-(int)(at-b));fx_small(12,132,216,b,GX_WHITE);
+   gx_str(b,"STATIC ",40);gx_num(b+7,(int)(plat_ram_used()/1024));at=b;while(*at)at++;gx_str(at," KiB",40-(int)(at-b));fx_small(12,153,216,b,GX_WHITE);
+   gx_str(b,"C1 STACK ",40);gx_num(b+9,(int)plat_core_stack_used());at=b;while(*at)at++;gx_str(at," B",40-(int)(at-b));fx_small(12,174,216,b,GX_WHITE);
+-  fx_small(12,195,216,ui.wake_reason==1?"WAKE: BUTTON":ui.wake_reason==2?"WAKE: KNOB":"WAKE: BOOT",GX_DIM);
++  uint32_t audio[6];plat_audio_metrics(audio);
++  gx_str(b,"BLOCK ",40);gx_num(b+6,(int)audio[0]);at=b;while(*at)at++;
++  gx_str(at,"/",40-(int)(at-b));gx_num(at+1,(int)audio[2]);while(*at)at++;
++  gx_str(at," us",40-(int)(at-b));fx_small(12,195,216,b,GX_WHITE);
++  fx_small(12,210,216,"FIRMWARE " EN_VERSION,GX_TEAL);
+   fx_small(12,222,216,"K3: PERFORMANCE / OC: OFF",GX_DIM);return;
+  }
+ 
+@@ -860,7 +864,7 @@
+  fx_text(15,119,210,text,GX_WHITE,&FONT_S);}
+ }
+ 
+-static void ui_present(void){profile_stage(PROF_UI);if(proj.par[P_FPS]){char b[32],*at;gx_num(b,(int)ui_fps);at=b;while(*at)at++;gx_str(at,"/",32-(int)(at-b));while(*at)at++;gx_num(at,(int)ui_frame_ms);while(*at)at++;gx_str(at,"ms",32-(int)(at-b));cv_rect(2,226,78,13,GX_BG);cv_text(4,226,&FONT_XS,b,GX_TEAL);}ui_power_notice();plat_brightness(proj.par[P_POWER]==5);cv_blit(0,0);profile_stage(PROF_FLUSH);plat_control_visible();ui_last_draw_ms=plat_ms()-ui_draw_start;if(ui.view==V_OBSERVATORY){unsigned m=ui.idle?1:0,b=ui_last_draw_ms/8u;if(b>15)b=15;profile_record(m,ui_last_draw_ms);}uint32_t audio_ms=(plat_audio_time_us()-ui_audio_start_us)/1000u;ui_lcd_wait_ms=(plat_lcd_wait_us()-ui_lcd_start_us)/1000u;uint32_t waits=audio_ms+ui_lcd_wait_ms;ui_cpu_draw_ms=ui_last_draw_ms>waits?ui_last_draw_ms-waits:0;if(ui_last_draw_ms>33||plat_cpu_pct()>80){if(gx_quality)gx_quality--;gx_recovery=0;}else if(ui_last_draw_ms<23&&plat_cpu_pct()<60&&++gx_recovery>=120){if(gx_quality<2)gx_quality++;gx_recovery=0;}}
++static void ui_present(void){profile_stage(PROF_UI);if(proj.par[P_FPS]&&(ui.view!=V_DEBUG||ui.idle)){char b[32],*at;gx_num(b,(int)ui_fps);at=b;while(*at)at++;gx_str(at,"/",32-(int)(at-b));while(*at)at++;gx_num(at,(int)ui_frame_ms);while(*at)at++;gx_str(at,"ms",32-(int)(at-b));cv_rect(2,226,78,13,GX_BG);cv_text(4,226,&FONT_XS,b,GX_TEAL);}ui_power_notice();plat_brightness(proj.par[P_POWER]==5);cv_blit(0,0);profile_stage(PROF_FLUSH);plat_control_visible();ui_last_draw_ms=plat_ms()-ui_draw_start;if(ui.view==V_OBSERVATORY){unsigned m=ui.idle?1:0,b=ui_last_draw_ms/8u;if(b>15)b=15;profile_record(m,ui_last_draw_ms);}uint32_t audio_ms=(plat_audio_time_us()-ui_audio_start_us)/1000u;ui_lcd_wait_ms=(plat_lcd_wait_us()-ui_lcd_start_us)/1000u;uint32_t waits=audio_ms+ui_lcd_wait_ms;ui_cpu_draw_ms=ui_last_draw_ms>waits?ui_last_draw_ms-waits:0;if(ui_last_draw_ms>33||plat_cpu_pct()>80){if(gx_quality)gx_quality--;gx_recovery=0;}else if(ui_last_draw_ms<23&&plat_cpu_pct()<60&&++gx_recovery>=120){if(gx_quality<2)gx_quality++;gx_recovery=0;}}
+ void ui_frame(void){
+  /* Audio and input keep their own cadence. Do not redraw a frozen animation
+   * at the menu rate; deliberate input can still refresh chrome immediately. */
+@@ -903,5 +907,5 @@
+  if(ui.view!=V_USB_SCREEN&&ui.view!=V_DRUMPARTS&&ui.view!=V_MATRIX&&ui.view!=V_MIXER&&ui.view!=V_DEBUG&&ui.view!=V_MIXAUTO){gx_shade(0,fx_bottom()-19,240,259-fx_bottom(),0,10);fx_dock();}
+  if(plat_ms()<ui.msg_until){fx_panel(7,45,226,25,FX_PEARL);fx_small(15,51,210,ui.msg,FX_INK);}
+  if(ui.view==V_USB_SCREEN)fx_text(4,227,232,"ALGO:PAGE HOME:BACK",GX_TEAL,&FONT_XS);
+- else if(ui.view!=V_MIXER&&ui.view!=V_OBSERVATORY)fx_text(4,227,232,ui_edit?"EDIT SELECT:ROLE SEL:DONE HOME:BACK":"ALGO:PAGE SELECT:SECTION SEL:EDIT",GX_TEAL,&FONT_XS);ui_present();
++ else if(ui.view!=V_MIXER&&ui.view!=V_OBSERVATORY&&ui.view!=V_DEBUG&&ui.view!=V_DRUMPARTS)fx_text(4,227,232,ui_edit?"EDIT SELECT:ROLE SEL:DONE HOME:BACK":"ALGO:SECTION SELECT:PAGE SEL:EDIT",GX_TEAL,&FONT_XS);ui_present();
+ }
+--- a/firmware/src/dsp/amb.c
++++ b/firmware/src/dsp/amb.c
+@@ -772,9 +772,9 @@
+ void en_audio_pressure(uint32_t used,uint32_t budget){
+  if(!budget)return;
+  if(used>en_audio_max_us)en_audio_max_us=used;
+- pressure_history=(uint8_t)((pressure_history<<1)|(used>budget-budget/4u));
++ pressure_history=(uint8_t)((pressure_history<<1)|(used>budget-budget*35u/100u));
+  if((pressure_history&3u)==3u){if(!en_graphics_throttle)en_pressure_events++;en_graphics_throttle=1;quiet_halves=0;}
+- else if(used<budget-budget*35u/100u){if(++quiet_halves>=512u){quiet_halves=0;en_graphics_throttle=0;}}
++ else if(used<=budget-budget*40u/100u){if(++quiet_halves>=512u){quiet_halves=0;en_graphics_throttle=0;}}
+  else quiet_halves=0;
+ }
+ #include "voice_runtime.h"

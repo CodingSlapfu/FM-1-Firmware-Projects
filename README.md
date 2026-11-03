@@ -1,14 +1,3 @@
-# FM-1 Firmware Projects
+# Crystal Water 1.0.4 test build
 
-EIN-1 0.32.0 AIR graph engineering backup. Release qualification is pending.
-
-```sh
-base=EIN-1/0.32.0
-cat "$base"/graph.zip.part* > graph.zip
-unzip graph.zip -d restore
-cp "$base"/resume/source/web/fm1ota.js restore/source/web/
-cp "$base"/air-applied/source/firmware/src/dsp/amb.h restore/source/firmware/src/dsp/
-for f in RESUME.md SHA256SUMS.txt native-validation.log source/firmware/src/app/ui.c source/firmware/src/app/air_control.h source/firmware/src/dsp/amb.c; do cp "$base/air-graph/$f" "restore/$f"; done
-for f in amb-0.32.0.fwsc emu/amb.wasm install-0.32.0.html; do cat "$base/air-graph/$f".part* > "restore/$f"; done
-(cd restore && sha256sum -c SHA256SUMS.txt)
-```
+Run `cat Crystal-Water-1.0.4-test.zip.part* > Crystal-Water-1.0.4-test.zip` and verify SHA-256 `d54d10f8d0cfbbf359fa367c4fff7e21c5a68ffac321108838dc54dfc4f9ea7e`. The archive includes firmware, installer, exact source and test evidence. Physical FM-1 verification is pending.

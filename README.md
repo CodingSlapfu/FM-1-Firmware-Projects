@@ -2,8 +2,12 @@
 
 ## EIN-1
 
-Latest engineering checkpoint: EIN-1 0.32.0 camera build. The archive includes firmware, installer, emulator, source, checksums, and rebuild instructions.
+The EIN-1 0.32.0 camera engineering checkpoint includes firmware, installer, emulator, source, checksums, and rebuild instructions. Firmware release and physical FM1 qualification are pending.
 
-Archive SHA-256: `30749da124ff7b2c5c0095e0de6d28ebbcd2d4dd9079882da8735a9c16a29572`
+Restore from a checkout of this repository:
 
-The archive is retained separately. This repository currently contains the backup index only. The build is unpublished and physical FM1 qualification remains pending.
+```sh
+cat EIN-1/0.32.0/camera.zip.part* > EIN1-0.32.0-camera-checkpoint.zip
+printf '%s  %s\n' '30749da124ff7b2c5c0095e0de6d28ebbcd2d4dd9079882da8735a9c16a29572' EIN1-0.32.0-camera-checkpoint.zip | sha256sum -c -
+unzip EIN1-0.32.0-camera-checkpoint.zip
+```

@@ -10,3 +10,6 @@ Created November 3, 2026. NEW PROJECT, not a continuation of retired EIN-1 / PAR
 6. End-to-end standing law: on 'build next version', complete full active queue, not a single function or subtask; no repetitive 'proceed' prompts. Lock checkout through edits/build/tests/deploy, save checkpoints across unavoidable execution limits, and mark requirements done only with evidence.
 
 **Scope**: original generative music instrument for relaxation/sound healing themes, Solfeggio tuning/tones, deep harmonic bass, acoustic-oriented instruments, soundscapes, drums and binaural beats, simple four-page UI. No medical efficacy claims.
+
+## Mandatory hardware optimization research standard
+Before implementing or optimizing device firmware, read the repository-root `FM1_HARDWARE_OPTIMIZATION_STANDARD.md` and apply its evidence-based SRAM placement, dual-core fallback, audio-deadline benchmarking, display DMA, memory budgets, and release-gate acceptance tests. This reference applies to all future FM-1 projects, but is not evidence that any optimization has been implemented or hardware-tested yet.

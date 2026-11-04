@@ -1,0 +1,15 @@
+name = "sound-healing"
+id_prefix = "FM-1_73"
+usb_manufacturer = "ZIAO"
+usb_product = "Sound Healing FM-1"
+o2 = ["dsp/engine.c"]
+include = ["dsp"]
+o2_cflags = ["-DSR_DEVICE"]
+words = "words.tsv"
+ble = false
+cpu2 = false
+usb_audio_in = true
+usb_audio_out = false
+tagline = "Generative music for reflective listening"
+repo = "https://github.com/CodingSlapfu/FM-1-Firmware-Projects"
+licence = "MPL-2.0"

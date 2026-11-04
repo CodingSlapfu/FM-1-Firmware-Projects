@@ -1,0 +1,7 @@
+the package: FM-1_099 with an installer                      ok
+installs, and the firmware comes back (FM-1_900123)          ok
+every read answered with the package, then 'success'         ok
+steps: bootstart,bootwrite,bootdone                          ok
+waited for the restart                                       ok
+a firmware that refuses it: bootrefused, nothing asked       ok
+installer boot test passed

@@ -1,0 +1,15 @@
+device/build/o2/dsp_engine.o: In function `.GJTIE20_0_0_':
+device/dsp/engine.c:(.ram_text+0x4c8): relocation truncated to fit: R_PI32V2_LONG_JUMP_23M2 against `fm_fabsf'
+warning: SDK uboot.boot differs from AC79NN_SDK_V1.2.1; the package will not match the reference
+warning: SDK cfg/eq_cfg_hw.bin differs from AC79NN_SDK_V1.2.1; the package will not match the reference
+font T: BarlowSemiCondensed-SemiBold.ttf 10px h 12, digit adv 5, 3600 B
+font XS: BarlowSemiCondensed-SemiBold.ttf 12px h 15, digit adv 6, 7005 B
+font S: BarlowSemiCondensed-Medium.ttf 15px h 16, digit adv 7, 8576 B
+font B: BarlowSemiCondensed-Bold.ttf 15px h 16, digit adv 8, 8752 B
+font M: BarlowSemiCondensed-SemiBold.ttf 23px h 24, digit adv 12, 11832 B
+font L: BarlowSemiCondensed-Bold.ttf 31px h 32, digit adv 16, 19776 B
+font set barlow: 60782 B (approx)
+words: 3 own + 51 common -> /workspace/scratch/9c764547533f/fm1-projects/FM1-Sound-Healing/device/web/words/95a41ce197.json (1059 B)
+loader: image 9636 B at 0x1c0a800, bss end 0x1c12210
+loader: ota.bin 8340 B
+build: pi32v2/bin/ld failed

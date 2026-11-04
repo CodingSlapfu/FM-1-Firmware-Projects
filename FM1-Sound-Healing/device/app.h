@@ -16,3 +16,6 @@ void app_input_only(void);
 void app_say(const char*,const char*);
 #define APP_HOST_EXPECT
 int app_expect(const char*,int*);
+
+#define APP_HOST_CPU2
+#define FM1_CPU1_TIMEOUT_US 2000u

@@ -1,0 +1,19 @@
+an unusual port name is not asked                                ok
+ports() lists every in/out pair                                  ok
+Try: the FM-1 answers on it                                      ok
+allowed, it is found from then on                                ok
+followed to the loader and back (FM-1_7010400)                   ok
+steps: start,verify,loader,write,reboot,done                     ok
+stops watching for new ports after the install                   ok
+the new names are not asked after it                             ok
+FM-1_8000014 (on "FM1 Community") is the Open firmware           ok
+its update loader ota-FM1C_<hex> is found                        ok
+FoMni-1 0.4 (FM-1_8000400) is not                                ok
+resume, back as FM-1_7010400: done                               ok
+resume, back as FM-1_7010300: mismatch                           ok
+not found by its name                                            ok
+found by its HELLO answer, installed (FM-1_7010400)              ok
+answered: the FM-1, not the loopback                             ok
+other gear and the loopback: three HELLOs, nothing else          ok
+checkUfw: the package passes, one flipped bit does not           ok
+installer ports test passed

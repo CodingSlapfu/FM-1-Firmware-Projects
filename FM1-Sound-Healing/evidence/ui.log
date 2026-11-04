@@ -1,0 +1,11 @@
+  ok running == 0
+  ok page == 0
+  ok running == 1
+  ok peak -180.0 dBFS (max -90)
+  ok page == 1
+  ok binaural == 1
+  ok track == 3
+  ok page == 3
+  ok drops == 0
+  ok running == 0
+host: 25110 ms simulated, 2365 blits, render 0.6% of real time (host CPU)

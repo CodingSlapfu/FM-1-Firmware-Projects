@@ -1,0 +1,14 @@
+Tone 174.0 Hz: spectral component verified
+Tone 285.0 Hz: spectral component verified
+Tone 396.0 Hz: spectral component verified
+Tone 417.0 Hz: spectral component verified
+Tone 528.0 Hz: spectral component verified
+Tone 639.0 Hz: spectral component verified
+Tone 741.0 Hz: spectral component verified
+Tone 852.0 Hz: spectral component verified
+Tone 963.0 Hz: spectral component verified
+Tone 111.0 Hz: spectral component verified
+Tone 136.1 Hz: spectral component verified
+Stop residual peak 0/32768
+Worst combination: 60s host render 3.243s CPU, peak 11608, engine 48124 bytes; NOT FM1 timing
+PASS DSP acceptance

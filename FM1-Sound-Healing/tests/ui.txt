@@ -1,0 +1,35 @@
+master 0
+wait 600
+expect running 0
+expect page 0
+tap PLAY
+wait 100
+expect running 1
+expect peak_db_max -90
+master 2048
+wait 1500
+shot play.png
+turn ALGO 1
+expect page 1
+tap FX
+wait 200
+expect binaural 1
+tap EDIT
+tap EDIT
+tap EDIT
+shot binaural.png
+turn SELECT 3
+expect track 3
+tapkey 7
+turn ALGO 2
+expect page 3
+turn K3 5
+wait 1000
+shot mix.png
+tap GLO
+wait 100
+shot debug.png
+expect drops 0
+tap PLAY
+wait 20000
+expect running 0

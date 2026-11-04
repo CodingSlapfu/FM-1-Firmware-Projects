@@ -68,17 +68,14 @@ static const int8_t scale_notes[5][7] = {
   {0,2,5,7,9,12,14}, {0,2,4,5,7,9,11}
 };
 static const uint8_t default_patches[SR_TRACKS]={1,3,6,9,12,15,17,19};
-static float clampf(float x,float lo,float hi){return x<lo?lo:(x>hi?hi:x);}
-static uint32_t rng(sr_engine *e){e->rng=e->rng*1664525u+1013904223u;return e->rng;}
-static float rnd(sr_engine *e){return (float)(rng(e)>>8)*(1.0f/16777216.0f);}
+static inline __attribute__((always_inline)) float clampf(float x,float lo,float hi){return x<lo?lo:(x>hi?hi:x);}
+static inline __attribute__((always_inline)) uint32_t rng(sr_engine *e){e->rng=e->rng*1664525u+1013904223u;return e->rng;}
+static inline __attribute__((always_inline)) float rnd(sr_engine *e){return (float)(rng(e)>>8)*(1.0f/16777216.0f);}
 static inline __attribute__((always_inline)) float sine(float phase){
   float p=phase*(float)LUT; int i=(int)p; float f=p-(float)i;
   return sin_table[i&LUT_MASK]*(1.0f-f)+sin_table[(i+1)&LUT_MASK]*f;
 }
-#if defined(SR_DEVICE) && !defined(PLAT_HOST)
-__attribute__((section(".ram_text"), noinline))
-#endif
-static float wave(sr_wave w,float phase,float brightness){
+static inline __attribute__((always_inline)) float wave(sr_wave w,float phase,float brightness){
   float a=sine(phase);
   switch(w){
    case SR_SINE:return a + brightness*.12f*sine(phase*2.f);
@@ -90,17 +87,16 @@ static float wave(sr_wave w,float phase,float brightness){
    default:return a;
   }
 }
-/* Indirect call spans the XIP-to-SRAM branch distance on pi32v2. */
-static float (*volatile render_wave)(sr_wave,float,float)=wave;
 float sr_note_frequency(const sr_engine *e,int midi){
   return (e->tuning_432?432.f:440.f)*expf(((float)midi-69.f)*.05776226505f);
 }
-float sr_sacred_bass_frequency(const sr_engine *e){
+static inline __attribute__((always_inline)) float sacred_hz(const sr_engine *e){
   float hz=sr_frequencies[e->frequency].hz;
   while(hz>110.f) hz*=.5f;
   while(hz<38.f) hz*=2.f;
   return hz;
 }
+float sr_sacred_bass_frequency(const sr_engine *e){return sacred_hz(e);}
 static void make_motif(sr_engine *e){
   for(int i=0;i<16;i++){
     if((i%4)==0) e->melody[i]=(int8_t)(rng(e)%5);
@@ -161,7 +157,7 @@ static void drum_trigger(sr_engine *e,uint32_t step,uint8_t energy){
   else if(e->drum_density==2 && (beat&3u)==2)e->shaker_env=.65f;
   else if(e->drum_density==1 && beat==8 && (rng(e)&1u)==0)e->shaker_env=.45f;
 }
-static float drum_sample(sr_engine *e){
+static inline __attribute__((always_inline)) float drum_sample(sr_engine *e){
   const sr_drum_kit *kit=&sr_drum_kits[e->drum_kit];float sound=0.f;
   if(e->kick_env>.0003f){
     float hz=49.f+45.f*e->kick_env;
@@ -185,12 +181,12 @@ static float drum_sample(sr_engine *e){
   e->drum_meter=fmaxf(e->drum_meter*.9993f,fabsf(sound));
   return sound*e->drum_level;
 }
-static float advance(float *phase,float hz){
+static inline __attribute__((always_inline)) float advance(float *phase,float hz){
   *phase+=hz/(float)SR_RATE;
   if(*phase>=1.f)*phase-=1.f;
   return sine(*phase);
 }
-static void render_binaural(sr_engine *e,float *left,float *right){
+static inline __attribute__((always_inline)) void render_binaural(sr_engine *e,float *left,float *right){
   // Each ear gets a separate sinusoid, mixed AFTER shared FX to preserve
   // the ear-specific frequency difference. Never collapse to mono.
   float target=(e->running && e->binaural_enabled)?1.f:0.f;
@@ -240,7 +236,7 @@ static void trigger(sr_engine *e){
   }
   (void)octave;
 }
-static float bed(sr_engine *e){
+static inline __attribute__((always_inline)) float bed(sr_engine *e){
   float n=rnd(e)*2.f-1.f;
   e->wind_lp+=(n-e->wind_lp)*.0008f;
   e->rain_lp+=(n-e->rain_lp)*.06f;
@@ -264,7 +260,7 @@ static float bed(sr_engine *e){
    default:return 0.f;
   }
 }
-static float fx(sr_engine *e,float dry,float *wide){
+static inline __attribute__((always_inline)) float fx(sr_engine *e,float dry,float *wide){
   float wet=0.f;
   for(int i=0;i<4;i++){
     uint16_t p=e->rev_pos[i];float delayed=(float)e->reverb[i][p]*(1.f/32768.f);
@@ -278,12 +274,14 @@ static float fx(sr_engine *e,float dry,float *wide){
   *wide=(wet*.56f-d*.12f)*e->reverb_amount;
   return wet*e->reverb_amount+d*e->delay_amount;
 }
-static int16_t sampleout(float v){
+static inline __attribute__((always_inline)) int16_t sampleout(float v){
   v=clampf(v,-.999f,.999f);return (int16_t)(v*32767.f);
 }
-void sr_render(sr_engine *e,int16_t *out,size_t frames){
+#if defined(SR_DEVICE) && !defined(PLAT_HOST)
+__attribute__((section(".ram_text"), noinline))
+#endif
+static void render_samples(sr_engine *e,int16_t *out,size_t frames){
   for(size_t i=0;i<frames;i++){
-    if(e->running && ++e->tick_phase>=e->tick_length){e->tick_phase=0;trigger(e);}
     float l=0.f,r=0.f,mix=0.f;
     for(int t=0;t<SR_TRACKS;t++)e->tracks[t].meter*=.999f;
     for(int j=0;j<SR_VOICES;j++){
@@ -294,9 +292,9 @@ void sr_render(sr_engine *e,int16_t *out,size_t frames){
       else v->env-=v->env*v->release_coef;
       if(!v->gate && v->env<.0005f){v->active=0;continue;}
       v->phase+=v->freq/(float)SR_RATE;
-      if(v->phase>=1.f)v->phase-=floorf(v->phase);
+      if(v->phase>=1.f)v->phase-=1.f;
       float brightness=p->brightness;if(v->freq>3000.f)brightness*=.15f;
-      float s=render_wave(p->wave,v->phase,brightness);
+      float s=wave(p->wave,v->phase,brightness);
       if(p->wave==SR_CHOIR_WAVE || e->tracks[v->track].patch>=20){
         v->phase2+=v->freq*1.0023f/(float)SR_RATE;if(v->phase2>=1.f)v->phase2-=1.f;
         s=.75f*s+.25f*sine(v->phase2);
@@ -318,7 +316,7 @@ void sr_render(sr_engine *e,int16_t *out,size_t frames){
     mix=(l+r)*.5f;
     // The dedicated reference tone is brought down by octaves for bass; its
     // amplitude is kept extremely low so it supports rather than masks music.
-    float base=sr_sacred_bass_frequency(e);
+    float base=sacred_hz(e);
     float sacred=advance(&e->bass_phase,base)*e->tone_level*.25f*e->transport_env;
     float reference=advance(&e->tone_phase,sr_frequencies[e->frequency].hz)*e->tone_level*e->transport_env;
     l+=reference;r+=reference;
@@ -336,4 +334,17 @@ void sr_render(sr_engine *e,int16_t *out,size_t frames){
     out[2*i]=sampleout(l*gain);out[2*i+1]=sampleout(r*gain);
     e->frame_count++;
   }
+}
+
+/* Explicit indirect call spans XIP -> SRAM; control-rate events remain in flash. */
+static void (*volatile render_block)(sr_engine*,int16_t*,size_t)=render_samples;
+void sr_render(sr_engine *e,int16_t *out,size_t frames){
+ while(frames){
+  if(e->running&&e->tick_phase>=e->tick_length){e->tick_phase=0;trigger(e);}
+  size_t n=frames;
+  if(e->running&&n>e->tick_length-e->tick_phase)n=e->tick_length-e->tick_phase;
+  render_block(e,out,n);
+  if(e->running)e->tick_phase+=(uint32_t)n;
+  out+=n*2;frames-=n;
+ }
 }

@@ -12,3 +12,5 @@ for f in RESUME.md SHA256SUMS.txt native-validation.log source/firmware/src/app/
 for f in amb-0.32.0.fwsc emu/amb.wasm install-0.32.0.html; do cat "$base/air-graph/$f".part* > "restore/$f"; done
 (cd restore && sha256sum -c SHA256SUMS.txt)
 ```
+
+Related: try FM-1 firmwares in the browser with the free community [FM-1 Emulator](https://fm1-emulator.atst.tools/).
